@@ -1,118 +1,114 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, {useState} from 'react';
 import {
   SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
   View,
+  Text,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  Switch,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Appearance} from 'react-native';
+import {FAB, Icon} from 'react-native-elements';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-type SectionProps = PropsWithChildren<{
+// import Svg, {Path} from 'react-native-svg';
+
+// Task interface
+interface Task {
+  id: string;
   title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+  category: 'complete' | 'pending' | 'postponed';
 }
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+const App = () => {
+  // Theme state
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(
+    Appearance.getColorScheme() === 'dark',
+  );
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  // Tasks state
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [newTaskTitle, setNewTaskTitle] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] =
+    useState<Task['category']>('pending');
+
+  // Color schemes with Tailwind-inspired colors
+  const lightTheme = {
+    background: 'bg-gray-100',
+    text: 'text-gray-900',
+    inputBg: 'bg-white',
+    inputBorder: 'border-gray-300',
+    cardBg: 'bg-white',
+    completeBtn: 'bg-green-500',
+    pendingBtn: 'bg-yellow-500',
+    postponedBtn: 'bg-red-500',
+    iconColor: '#000000',
+  };
+
+  const darkTheme = {
+    background: 'bg-gray-900',
+    text: 'text-gray-100',
+    inputBg: 'bg-gray-800',
+    inputBorder: 'border-gray-700',
+    cardBg: 'bg-gray-800',
+    completeBtn: 'bg-green-700',
+    pendingBtn: 'bg-yellow-700',
+    postponedBtn: 'bg-red-700',
+    iconColor: '#FFFFFF',
+  };
+
+  const theme = isDarkMode ? darkTheme : lightTheme;
+
+  // Add new task
+  const addTask = () => {
+    if (newTaskTitle.trim()) {
+      const newTask: Task = {
+        id: Math.random().toString(),
+        title: newTaskTitle,
+        category: selectedCategory,
+      };
+      setTasks([...tasks, newTask]);
+      setNewTaskTitle('');
+    }
+  };
+
+  // Update task category
+  const updateTaskCategory = (
+    taskId: string,
+    newCategory: Task['category'],
+  ) => {
+    setTasks(
+      tasks.map(task =>
+        task.id === taskId ? {...task, category: newCategory} : task,
+      ),
+    );
+  };
+
+  // Category icons
+  const CategoryIcons = {
+    complete: 'check-circle',
+    pending: 'access-time',
+    postponed: 'pause-circle-filled',
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <View className={`flex-1 ${theme.background} p-4`}>
+      <Text className={`text-2xl font-bold ${theme.text}`}>Testing</Text>
+      <Icon
+        raised
+        name="heartbeat"
+        type="font-awesome"
+        color="#f50"
+        onPress={() => console.log('hello')}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
+ 
+      <MaterialCommunityIcon name="heart" size={30} color="#000" />
+ 
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+    </View>
+  );
+};
 
 export default App;
